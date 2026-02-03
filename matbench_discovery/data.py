@@ -28,6 +28,8 @@ from tqdm import tqdm
 
 from matbench_discovery import DATA_DIR, pkg_is_editable
 
+MATBENCH_DIR = os.environ.get("MATBENCH_DIR", f"/mnt/shared-storage-gpfs2/ailab-omnimat-shared/liuzifeng/data/matbench-discovery-main/data/")
+
 # ruff: noqa: T201
 T = TypeVar("T", bound="Files")
 
@@ -341,10 +343,9 @@ class DataFiles(Files):
         "https://figshare.com/ndownloader/files/41619375",
     )
 
-MATBENCH_DIR = os.environ.get("MATBENCH_DIR", f"/mnt/shared-storage-gpfs2/ailab-omnimat-shared/liuzifeng/data/matbench-discovery-main/data/")
 class DataFilesCustomized(Files):
     """Enum of data files with associated file directories and URLs."""
-
+    
     mp_computed_structure_entries = (
         "mp/2023-02-07-mp-computed-structure-entries.json.gz",
         "https://figshare.com/ndownloader/files/40344436",

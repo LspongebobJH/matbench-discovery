@@ -11,6 +11,9 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+            "env": {
+                "MATBENCH_DIR": "hi!"
+            },
             "justMyCode": false
         }
     ]
