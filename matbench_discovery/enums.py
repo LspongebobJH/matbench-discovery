@@ -1,7 +1,11 @@
 """Enums used as keys/accessors for dicts and dataframes across Matbench Discovery."""
 
-from enum import StrEnum, unique
-from typing import Self
+from enum import unique
+try:
+    from enum import StrEnum
+except ImportError:
+    from aenum import StrEnum
+# from typing import Self
 
 import pymatviz as pmv
 
@@ -11,7 +15,7 @@ class LabelEnum(StrEnum):
 
     def __new__(
         cls, val: str, label: str | None = None, desc: str | None = None
-    ) -> Self:
+    ) -> "LabelEnum":
         """Create a new class."""
         member = str.__new__(cls, val)
         member._value_ = val

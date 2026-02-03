@@ -3,7 +3,12 @@
 import json
 import os
 import warnings
-from datetime import UTC, datetime
+from datetime import datetime
+try:
+    from datetime import UTC
+except ImportError:
+    from datetime import timezone
+    UTC = timezone.utc
 from importlib.metadata import Distribution, version
 
 import matplotlib.pyplot as plt

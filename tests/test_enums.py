@@ -1,5 +1,8 @@
 import inspect
-from enum import StrEnum
+try:
+    from enum import StrEnum
+except ImportError:
+    from aenum import StrEnum
 
 import matbench_discovery.enums
 from matbench_discovery.enums import LabelEnum

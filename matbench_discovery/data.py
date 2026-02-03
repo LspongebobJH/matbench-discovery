@@ -9,10 +9,15 @@ import sys
 import zipfile
 from collections import defaultdict
 from collections.abc import Callable
-from enum import EnumMeta, StrEnum, _EnumDict
+from enum import _EnumDict
+try:
+    from enum import StrEnum, EnumMeta
+except ImportError:
+    from aenum import StrEnum, EnumMeta
 from glob import glob
 from pathlib import Path
-from typing import Any, Self, TypeVar
+# from typing import Self
+from typing import Any, TypeVar
 
 import ase.io
 import pandas as pd
@@ -210,7 +215,7 @@ class Files(StrEnum, metaclass=MetaFiles):
 
     def __new__(
         cls, file_path: str, url: str | None = None, label: str | None = None
-    ) -> Self:
+    ) -> "Files":
         """Create a new member of the FileUrls enum with a given URL where to load the
         file from and directory where to save it to.
         """
@@ -336,7 +341,101 @@ class DataFiles(Files):
         "https://figshare.com/ndownloader/files/41619375",
     )
 
+MATBENCH_DIR = os.environ.get("MATBENCH_DIR", f"/mnt/shared-storage-gpfs2/ailab-omnimat-shared/liuzifeng/data/matbench-discovery-main/data/")
+class DataFilesCustomized(Files):
+    """Enum of data files with associated file directories and URLs."""
 
-df_wbm = pd.read_csv(DataFiles.wbm_summary.path)
+    mp_computed_structure_entries = (
+        "mp/2023-02-07-mp-computed-structure-entries.json.gz",
+        "https://figshare.com/ndownloader/files/40344436",
+    )
+    mp_elemental_ref_entries = (
+        "mp/2023-02-07-mp-elemental-reference-entries.json.gz",
+        "https://figshare.com/ndownloader/files/40387775",
+    )
+    mp_energies = (
+        "mp/2023-01-10-mp-energies.csv.gz",
+        "https://figshare.com/ndownloader/files/49083124",
+    )
+    mp_patched_phase_diagram = (
+        "mp/2023-02-07-ppd-mp.pkl.gz",
+        "https://figshare.com/ndownloader/files/48241624",
+    )
+    mp_trj_extxyz = (
+        "mp/2024-09-03-mp-trj.extxyz.zip",
+        "https://figshare.com/ndownloader/files/49034296",
+    )
+    # snapshot of every task (calculation) in MP as of 2023-03-16 (14 GB)
+    all_mp_tasks = (
+        "mp/2023-03-16-all-mp-tasks.zip",
+        "https://figshare.com/ndownloader/files/43350447",
+    )
+
+    wbm_computed_structure_entries = (
+        "wbm/2022-10-19-wbm-computed-structure-entries.json.bz2",
+        "https://figshare.com/ndownloader/files/40344463",
+    )
+    wbm_relaxed_atoms = (
+        "wbm/2024-08-04-wbm-relaxed-atoms.extxyz.zip",
+        "https://figshare.com/ndownloader/files/48169600",
+    )
+    wbm_initial_structures = (
+        "wbm/2022-10-19-wbm-init-structs.json.bz2",
+        "https://figshare.com/ndownloader/files/40344466",
+    )
+    wbm_initial_atoms = (
+        "wbm/2024-08-04-wbm-initial-atoms.extxyz.zip",
+        "https://figshare.com/ndownloader/files/48169597",
+    )
+    wbm_cses_plus_init_structs = (
+        "wbm/2022-10-19-wbm-computed-structure-entries+init-structs.json.bz2",
+        "https://figshare.com/ndownloader/files/40344469",
+    )
+    wbm_summary = (
+        "wbm/2023-12-13-wbm-summary.csv.gz",
+        "https://figshare.com/ndownloader/files/44225498",
+    )
+    alignn_checkpoint = (
+        "2023-06-02-pbenner-best-alignn-model.pth.zip",
+        "https://figshare.com/ndownloader/files/41233560",
+    )
+    mp_trj = (
+        "mp/2022-09-16-mp-trj.json",
+        "https://figshare.com/ndownloader/files/41619375",
+    )
+
+    def __str__(self) -> str:
+        """File path associated with the file URL. Use str(DataFiles.some_key) if you
+        want the absolute file path without auto-downloading the file if it doesn't
+        exist yet, e.g. for use in script that generates the file in the first place.
+        """
+        return os.path.join(MATBENCH_DIR, self.rel_path)
+
+    @property
+    def path(self) -> str:
+        """Return the file path associated with the file URL if it exists, otherwise
+        download the file first, then return the path.
+        """
+        key, url, rel_path = self.name, self._url, self._rel_path  # type: ignore[attr-defined]
+        abs_path = os.path.join(MATBENCH_DIR, rel_path)
+        if not os.path.isfile(abs_path):
+            is_ipython = hasattr(__builtins__, "__IPYTHON__")
+            # default to 'y' if not in interactive session, and user can't answer
+            answer = (
+                input(
+                    f"{abs_path!r} associated with {key=} does not exist. Download it "
+                    "now? This will cache the file for future use. [y/n] "
+                )
+                if is_ipython or sys.stdin.isatty()
+                else "y"
+            )
+            if answer.lower().strip() == "y":
+                if not is_ipython:
+                    print(f"Downloading {key!r} from {url} to {abs_path} for caching")
+                download_file(abs_path, url)
+        return abs_path
+
+df_wbm = pd.read_csv(DataFilesCustomized.wbm_summary.path)
 # str() around Key.mat_id added for https://github.com/janosh/matbench-discovery/issues/81
-df_wbm.index = df_wbm[str(Key.mat_id)]
+# df_wbm.index = df_wbm[str(Key.mat_id)]
+df_wbm.index = df_wbm[Key.mat_id.value]
