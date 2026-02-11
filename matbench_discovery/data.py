@@ -344,6 +344,8 @@ class DataFiles(Files):
     )
 
 class DataFilesCustomized(Files):
+    # jiahang (TODO): mp_trj_json_gz does not exist.
+    # jiahang (TODO): wbm_dft_geo_opt... and phonondb_pbe_103... do not exist.
     """Enum of data files with associated file directories and URLs."""
     
     mp_computed_structure_entries = (
@@ -354,7 +356,7 @@ class DataFilesCustomized(Files):
         "mp/2023-02-07-mp-elemental-reference-entries.json.gz",
         "https://figshare.com/ndownloader/files/40387775",
     )
-    mp_energies = (
+    mp_energies = ( # jiahang (TODO): the reported version is mp/2025-02-01-mp-energies
         "mp/2023-01-10-mp-energies.csv.gz",
         "https://figshare.com/ndownloader/files/49083124",
     )
