@@ -25,6 +25,6 @@ uv pip install -e .
 cd ~
 git clone --branch jiahang/mattersim_work --depth 1 https://github.com/Jielanlee/OmniMat.git OmniMat-mattersim-work
 cd OmniMat-mattersim-work
-
+export MATBENCH_DIR=${matbench_data_directory}
 python benchmark_matbench.py --checkpoint_path ~/OmniMat-mattersim-jiahang/pretrained_models/mattersim-v1.0.0-1M.pth --log_path ./test.log
 ```
